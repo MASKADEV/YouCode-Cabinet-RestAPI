@@ -1,6 +1,5 @@
 <?php 
 
-
 require_once 'src/security/jwt_handler.php';
 
 class UsersController extends JwtController{
@@ -34,40 +33,23 @@ class UsersController extends JwtController{
 	}
 
 	public function signup() {
-		if($this->gettoken()) {
-			try {
-				$this->verification($this->gettoken());
 				if($_SERVER['REQUEST_METHOD'] == 'POST')
 				{
+					$full_name = json_decode(file_get_contents("php://input"));
+  					$email = json_decode(file_get_contents("php://input")); 
+  					$password = json_decode(file_get_contents("php://input")); 
 					require_once('src/models/authentication.php');
 					require_once('src/config/Header.php');
-					if(isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])){
-							if(!empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['password'])) {
-							$auth =  new Authentication();
-							$result = $auth->signup($_POST['name'], $_POST['email'], $_POST['password']);
-							if($result) {
-								echo Authentication::message('User has been Added!', false);
-							}else {
-								echo Authentication::message('User Already exist', false);
-							}
-						}else {
-								echo Authentication::message('Empty InputField!', true);
-						}
+					$auth =  new Authentication();
+					$result = $auth->signup($full_name->full_name, $email->email, $password->password);
+					if($result) {
+					echo Authentication::message('User has been Added!', false);
 					}else {
-						echo Authentication::message('Error 404', true);
+						echo Authentication::message('User Already exist', false);
 					}
 				}else {
 					echo Authentication::message('Internal server issue please contact the support Team', true);
 				}
-
-			} catch (\Throwable $th) {
-				print_r(json_encode("unauthorized_token"));
-			}
-		}else {
-			echo 'no token available here is a new toekn for you:' . '<br>';
-			echo $this->authorization();
-
-		}
 
 	}
 

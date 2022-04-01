@@ -6,7 +6,7 @@ use \Firebase\JWT\JWT;
 class JwtController
 {
 
-    private $key = 'maska_token';
+    private $key = 'marniga_halal_tayiba';
 
 
     public function authorization()
