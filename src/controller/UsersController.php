@@ -14,22 +14,19 @@ class UsersController extends JwtController{
 
 	public function signin()
 	{
-				if($_SERVER['REQUEST_METHOD'] == 'POST')
-				{
-					require_once('src/models/authentication.php');
-					require_once('src/config/Header.php');
-					if(isset($_POST['email']) && isset($_POST['password'])) {
-						$auth =  new Authentication();
-						$result = $auth->signin($_POST['email'], $_POST['password']);
-						if($result){
-							echo json_encode($result);
-						}else {
-							echo Authentication::message('User not exist please try to sign up first', true);
-						}
-					}else {
-						echo Authentication::message('Empty InputField!', true);
-					}
-				}
+		if($_SERVER['REQUEST_METHOD'] == 'POST')
+		{
+			require_once('src/models/authentication.php');
+			require_once('src/config/Header.php');
+			$id = json_decode(file_get_contents("php://input"));
+			$auth =  new Authentication();
+			$result = $auth->signin($id->id);
+			if($result){
+				echo json_encode($result);
+			}else {
+				echo Authentication::message('User not exist please try to sign up first', true);
+			}
+		}
 	}
 
 	public function signup() {
