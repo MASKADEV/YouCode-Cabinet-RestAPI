@@ -54,17 +54,18 @@ class UsersController extends JwtController{
 		require_once('src/config/Header.php');
 		require_once('src/models/connection.php');
 		if($_SERVER['REQUEST_METHOD'] == 'POST') {
-			if(!empty($_POST['user_id']) && !empty($_POST['booking_date']) && !empty($_POST['services_type']) && !empty($_POST['price'])){
+			$user_id = json_decode(file_get_contents("php://input"));
+			$booking_date = json_decode(file_get_contents("php://input"));
+			$booking_time = json_decode(file_get_contents("php://input"));
+			$services_type = json_decode(file_get_contents("php://input"));
+			$price = json_decode(file_get_contents("php://input"));
 				$db = new Database();
-				$result = $db->insert('booking', ['user_id', 'booking_date', 'services_type', 'price'], [$_POST['user_id'], $_POST['booking_date'], $_POST['services_type'], $_POST['price']]);
+				$result = $db->insert('booking', ['user_id', 'booking_date', 'booking_time' ,'services_type', 'price'], [$user_id->user_id, $booking_date->booking_date, $booking_time->booking_time ,$services_type->services_type, $price->price]);
 				if($result) {
-					echo Database::message('thank you for your booking', false);
+					echo Database::message('Thank you for your booking', false);
 				}else {
 					echo Database::message('failed Booking!', true);
 				}
-			}else {
-				echo Database::message('please fill the whole form', true);
-			}
 		}else {
 			echo Database::message('Internal server issue please contact the support Team', true);
 		}
