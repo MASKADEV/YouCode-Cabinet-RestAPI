@@ -2,7 +2,7 @@
 require_once 'src/security/jwt_handler.php';
 
 class UsersController extends JwtController{
-	
+
 	public function __construct()
 	{
 	}
@@ -124,4 +124,21 @@ class UsersController extends JwtController{
 		}
 	}
 
+	public function checkBookedTime()
+	{
+		require_once('src/config/Header.php');
+		require_once('src/models/connection.php');
+		$booking_date = json_decode(file_get_contents("php://input"));
+		if($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$db = new Database();
+			$result = $db->checkBookedTime($booking_date->booking_date);
+			if($result){
+				echo $result;
+			}else {
+				echo Database::message('Operation Failed!', true);
+			}
+		}else {
+			echo Database::message('Internal server issue please contact the support Team', true);
+		}
+	}
 }

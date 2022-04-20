@@ -46,7 +46,7 @@ class Database
 	public function update($table, $id, $date, $time, $service_type, $price)
 	{
 		$str="UPDATE `booking` SET `booking_date`=$date,`time`=$time,`service_type`=$service_type,`price`=$price WHERE id = $id";
-		$str="UPDATE `booking` SET `booking_date`='dasdasd',`time`=234234,`service_type`=23234234,`price`=213424234 WHERE id = 2";
+		// $str="UPDATE `booking` SET `booking_date`='dasdasd',`time`=234234,`service_type`=23234234,`price`=234234 WHERE id = 2";
 		$query=$this->conn->prepare($str);
 		if($query->execute()) {
 			return true;
@@ -86,6 +86,18 @@ class Database
 			[$id]
 		);
 		return $query->fetch(PDO::FETCH_ASSOC);
+	}
+
+	public function checkBookedTime($date) {
+		ini_set('display_errors','On');
+		ini_set('error_reporting',E_ALL);
+		$str = "SELECT * FROM `booking` WHERE booking_date=?";
+		$query=$this->conn->prepare($str);
+		$query->execute(
+			[$date]
+		);
+		$result = $query->fetchAll(PDO::FETCH_ASSOC);
+		return json_encode($result);
 	}
 
 	public static function message($content, $status) {
