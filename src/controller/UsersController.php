@@ -17,9 +17,9 @@ class UsersController extends JwtController{
 				{
 					require_once('src/models/authentication.php');
 					require_once('src/config/Header.php');
-					if(isset($_POST['id'])) {
 						$auth =  new Authentication();
-						$result = $auth->signin($_POST['id']);
+						$user_id = json_decode(file_get_contents("php://input"));
+						$result = $auth->signin($user_id->user_id);
 						if($result){
 							require_once('src/security/jwt_handler.php');
 							$jwt = new JwtController();
@@ -28,9 +28,6 @@ class UsersController extends JwtController{
 						}else {
 							echo Authentication::message('User not exist please try to sign up first', null, null, true);
 						}
-					}else {
-						echo Authentication::message('Empty InputField!', null, null, true);
-					}
 				}
 	}
 
@@ -40,12 +37,17 @@ class UsersController extends JwtController{
 		{
 			require_once('src/models/authentication.php');
 			require_once('src/config/Header.php');
-			if(isset($_POST['full_name']) && isset($_POST['email']) && isset($_POST['password'])){
-				// echo $_POST['full_name'] . $_POST['email'] . $_POST['password']; 
-					if(!empty($_POST['full_name']) && !empty($_POST['email']) && !empty($_POST['password'])) {
+			$email = json_decode(file_get_contents("php://input"));
+			$full_name = json_decode(file_get_contents("php://input"));
+			$password = json_decode(file_get_contents("php://input"));
+			$password_confirmation = json_decode(file_get_contents("php://input"));
+			if(!empty($email) && !empty($full_name) && !empty($password)){
+				
+				if($password->password == $password_confirmation->password_confirmation) {
 					$auth =  new Authentication();
 					$id = uniqid('gfg');
-					$result = $auth->signup($id, $_POST['full_name'], $_POST['email'], $_POST['password']);
+
+					$result = $auth->signup($id, $full_name->full_name, $email->email, $password->password);
 					if($result) {
 						$jwt = new JwtController();
 						$token = $jwt->authorization();
@@ -54,32 +56,44 @@ class UsersController extends JwtController{
 						echo Authentication::message('User Already exist', null, null, false);
 					}
 				}else {
-						echo Authentication::message('Empty InputField!', null, null, true);
+					echo Authentication::message('password not the same', null, null, false);
 				}
+
 			}else {
-				echo Authentication::message('Error 404', null, null, true);
+				echo Authentication::message('Empty InputField!', null, null, true);
 			}
+
 		}else {
 			echo Authentication::message('Internal server issue please contact the support Team',null, null, true);
 		}
 
 	}
 
+	public function fetchBooking() {
+		require_once('src/config/Header.php');
+		require_once('src/models/connection.php');
+		$user_id = json_decode(file_get_contents("php://input"));
+		$db = new Database();
+		$result = $db->fetchBooking($user_id->user_id);
+		echo json_encode($result);
+	}
+
 	public function addBooking() {
 		require_once('src/config/Header.php');
 		require_once('src/models/connection.php');
 		if($_SERVER['REQUEST_METHOD'] == 'POST') {
-			if(!empty($_POST['user_id']) && !empty($_POST['booking_date']) && !empty($_POST['time']) && !empty($_POST['service_type']) && !empty($_POST['price'])){
+			$user_id = json_decode(file_get_contents("php://input"));
+			$booking_date = json_decode(file_get_contents("php://input"));
+			$time = json_decode(file_get_contents("php://input"));
+			$service_type = json_decode(file_get_contents("php://input"));
+			$price = json_decode(file_get_contents("php://input"));
 				$db = new Database();
-				$result = $db->insert('booking', ['user_id', 'booking_date', 'time', 'service_type', 'price'], [$_POST['user_id'], $_POST['booking_date'], $_POST['time'], $_POST['service_type'], $_POST['price']]);
+				$result = $db->insert('booking', ['user_id', 'booking_date', 'time', 'service_type', 'price'], [$user_id->user_id, $booking_date->booking_date, $time->time, $service_type->service_type, $price->price]);
 				if($result) {
 					echo Database::message('thank you for your booking', false);
 				}else {
 					echo Database::message('failed Booking!', true);
 				}
-			}else {
-				echo Database::message('please fill the whole form', true);
-			}
 		}else {
 			echo Database::message('Internal server issue please contact the support Team', true);
 		}

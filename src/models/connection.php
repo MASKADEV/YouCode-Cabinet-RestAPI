@@ -100,6 +100,16 @@ class Database
 		return json_encode($result);
 	}
 
+	public function fetchBooking($user_id) {
+		$str = "SELECT * FROM `booking` WHERE user_id=?";
+		$query=$this->conn->prepare($str);
+		$query->execute(
+			[$user_id]
+		);
+		$result = $query->fetchAll(PDO::FETCH_ASSOC);
+		return json_encode($result);
+	}
+
 	public static function message($content, $status) {
 	    return json_encode(array('message' => $content, 'error' => $status));
 	}
