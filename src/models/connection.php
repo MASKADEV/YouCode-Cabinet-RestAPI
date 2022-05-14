@@ -45,11 +45,12 @@ class Database
 
 	public function update($table, $id, $date, $time, $service_type, $price)
 	{
-		$str="UPDATE `booking` SET `booking_date`=$date,`time`=$time,`service_type`=$service_type,`price`=$price WHERE id = $id";
-		// $str="UPDATE `booking` SET `booking_date`='dasdasd',`time`=234234,`service_type`=23234234,`price`=234234 WHERE id = 2";
+		$str="UPDATE ". $table . " SET `booking_date`=?,`time`=?,`service_type`=?,`price`=? WHERE id=?";
 		$query=$this->conn->prepare($str);
-		if($query->execute()) {
-			return true;
+		$query->execute([$date, $time, $service_type, $price, $id]);
+		$result = $this->selectOne('booking', 'id', $id);
+		if(!empty($result)){
+			return $result;
 		}else {
 			return false;
 		}
