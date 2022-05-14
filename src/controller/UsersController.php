@@ -155,4 +155,28 @@ class UsersController extends JwtController{
 			echo Database::message('Internal server issue please contact the support Team', true);
 		}
 	}
+
+	public function editBooking() {
+		ini_set('display_errors', 1);
+		ini_set('display_startup_errors', 1);
+		error_reporting(E_ALL);
+		require_once('src/config/Header.php');
+		require_once('src/models/connection.php');
+		if($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$id = json_decode(file_get_contents("php://input"));
+			$booking_date = json_decode(file_get_contents("php://input"));
+			$time = json_decode(file_get_contents("php://input"));
+			$service_type = json_decode(file_get_contents("php://input"));
+			$price = json_decode(file_get_contents("php://input"));
+			$db = new Database();
+			$result = $db->update('booking', $id->id, $booking_date->booking_date, $time->time, $service_type->service_type, $price->price);
+			if($result) {
+				echo json_encode($result);
+			}else {
+				echo Database::message('update Failed!', true);
+			}
+		}else {
+			echo Database::message('Internal server issue please contact the support Team', true);
+		}
+	}
 }
